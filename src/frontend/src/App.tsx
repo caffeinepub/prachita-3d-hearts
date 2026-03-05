@@ -1,8 +1,12 @@
 import { Environment, OrbitControls, useTexture } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { AnimatePresence, motion } from "motion/react";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
+import MusicPlayer from "./components/MusicPlayer";
+
+const RacingGame = lazy(() => import("./components/RacingGame"));
+const FighterGame = lazy(() => import("./components/FighterGame"));
 
 // ===== HEART GEOMETRY HELPER =====
 function createHeartShape(): THREE.Shape {
@@ -588,6 +592,8 @@ export default function App() {
   const [showContent, setShowContent] = useState(false);
   const [showImage, setShowImage] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
+  const [showRacing, setShowRacing] = useState(false);
+  const [showFighter, setShowFighter] = useState(false);
 
   const handleIntroComplete = () => {
     setIntroComplete(true);
@@ -856,6 +862,114 @@ export default function App() {
 
       {/* Video Frame - bottom left */}
       <VideoFrame show={showVideo} />
+
+      {/* Music Player */}
+      <MusicPlayer />
+
+      {/* Game Launch Buttons */}
+      <AnimatePresence>
+        {showContent && (
+          <motion.div
+            className="fixed z-30 pointer-events-auto"
+            style={{
+              bottom: "4.5rem",
+              left: "50%",
+              transform: "translateX(-50%)",
+              display: "flex",
+              gap: 12,
+              whiteSpace: "nowrap",
+            }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.8, duration: 0.7 }}
+          >
+            <button
+              type="button"
+              data-ocid="games.racing_button"
+              onClick={() => setShowRacing(true)}
+              style={{
+                padding: "7px 18px",
+                borderRadius: "999px",
+                border: "1px solid oklch(0.55 0.22 350 / 0.4)",
+                background: "oklch(0.1 0.04 300 / 0.65)",
+                backdropFilter: "blur(14px)",
+                WebkitBackdropFilter: "blur(14px)",
+                color: "oklch(0.85 0.12 60)",
+                fontSize: "0.75rem",
+                letterSpacing: "0.1em",
+                fontFamily: "Georgia, serif",
+                cursor: "pointer",
+                boxShadow:
+                  "0 0 16px oklch(0.62 0.25 20 / 0.2), inset 0 1px 0 oklch(0.8 0.1 350 / 0.1)",
+                transition: "all 0.25s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor =
+                  "oklch(0.72 0.22 60 / 0.7)";
+                (e.currentTarget as HTMLButtonElement).style.color =
+                  "oklch(0.95 0.15 60)";
+                (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                  "0 0 28px oklch(0.72 0.22 60 / 0.35), inset 0 1px 0 oklch(0.8 0.1 60 / 0.2)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor =
+                  "oklch(0.55 0.22 350 / 0.4)";
+                (e.currentTarget as HTMLButtonElement).style.color =
+                  "oklch(0.85 0.12 60)";
+                (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                  "0 0 16px oklch(0.62 0.25 20 / 0.2), inset 0 1px 0 oklch(0.8 0.1 350 / 0.1)";
+              }}
+            >
+              🏎 Racing Game
+            </button>
+            <button
+              type="button"
+              data-ocid="games.fighter_button"
+              onClick={() => setShowFighter(true)}
+              style={{
+                padding: "7px 18px",
+                borderRadius: "999px",
+                border: "1px solid oklch(0.55 0.22 350 / 0.4)",
+                background: "oklch(0.1 0.04 300 / 0.65)",
+                backdropFilter: "blur(14px)",
+                WebkitBackdropFilter: "blur(14px)",
+                color: "oklch(0.85 0.12 350)",
+                fontSize: "0.75rem",
+                letterSpacing: "0.1em",
+                fontFamily: "Georgia, serif",
+                cursor: "pointer",
+                boxShadow:
+                  "0 0 16px oklch(0.62 0.25 20 / 0.2), inset 0 1px 0 oklch(0.8 0.1 350 / 0.1)",
+                transition: "all 0.25s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor =
+                  "oklch(0.72 0.22 350 / 0.7)";
+                (e.currentTarget as HTMLButtonElement).style.color =
+                  "oklch(0.95 0.15 350)";
+                (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                  "0 0 28px oklch(0.72 0.22 350 / 0.35), inset 0 1px 0 oklch(0.8 0.1 350 / 0.2)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor =
+                  "oklch(0.55 0.22 350 / 0.4)";
+                (e.currentTarget as HTMLButtonElement).style.color =
+                  "oklch(0.85 0.12 350)";
+                (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                  "0 0 16px oklch(0.62 0.25 20 / 0.2), inset 0 1px 0 oklch(0.8 0.1 350 / 0.1)";
+              }}
+            >
+              ⚔ Fighter Game
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Game Overlays */}
+      <Suspense fallback={null}>
+        {showRacing && <RacingGame onClose={() => setShowRacing(false)} />}
+        {showFighter && <FighterGame onClose={() => setShowFighter(false)} />}
+      </Suspense>
 
       {/* Footer */}
       <div className="fixed bottom-4 left-0 right-0 z-30 flex justify-center pointer-events-none">
