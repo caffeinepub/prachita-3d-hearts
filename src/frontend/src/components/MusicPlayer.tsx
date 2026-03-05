@@ -1,50 +1,104 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export default function MusicPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
-  const [hasInteracted, setHasInteracted] = useState(false);
+  const [blocked, setBlocked] = useState(false);
 
+  const tryPlay = useCallback((audio: HTMLAudioElement) => {
+    audio.volume = 0.5;
+    return audio.play().then(() => {
+      setPlaying(true);
+      setBlocked(false);
+    });
+  }, []);
+
+  // Try to autoplay on mount once audio is ready
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    audio.volume = 0.45;
-  }, []);
+
+    const onCanPlay = () => {
+      tryPlay(audio).catch(() => {
+        setBlocked(true);
+      });
+    };
+
+    audio.addEventListener("canplaythrough", onCanPlay, { once: true });
+    // Trigger load
+    audio.load();
+
+    return () => {
+      audio.removeEventListener("canplaythrough", onCanPlay);
+    };
+  }, [tryPlay]);
+
+  // If autoplay was blocked, start music on first click anywhere
+  useEffect(() => {
+    if (!blocked) return;
+
+    const unlock = () => {
+      const audio = audioRef.current;
+      if (!audio) return;
+      tryPlay(audio).catch(() => {});
+    };
+
+    document.addEventListener("click", unlock, { once: true });
+    document.addEventListener("touchstart", unlock, { once: true });
+    return () => {
+      document.removeEventListener("click", unlock);
+      document.removeEventListener("touchstart", unlock);
+    };
+  }, [blocked, tryPlay]);
 
   const toggle = () => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    if (!hasInteracted) {
-      setHasInteracted(true);
-      audio
-        .play()
-        .then(() => setPlaying(true))
-        .catch(() => setPlaying(false));
-      return;
-    }
-
     if (playing) {
       audio.pause();
       setPlaying(false);
     } else {
-      audio
-        .play()
-        .then(() => setPlaying(true))
-        .catch(() => setPlaying(false));
+      tryPlay(audio).catch(() => setPlaying(false));
     }
   };
 
   return (
     <>
-      {/* Hidden audio element */}
       {/* biome-ignore lint/a11y/useMediaCaption: background ambient music, no speech content */}
       <audio
         ref={audioRef}
         loop
         preload="auto"
-        src="https://cdn.pixabay.com/audio/2022/10/30/audio_8ead710b97.mp3"
+        src="/assets/Ladki Kyon Na Jane Kyon Hum Tum 128 Kbps.mp3"
       />
+
+      {/* Tap-to-start hint shown when autoplay is blocked */}
+      {blocked && (
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 999,
+            background: "oklch(0.1 0.04 300 / 0.92)",
+            border: "1px solid oklch(0.62 0.22 350 / 0.7)",
+            borderRadius: "1rem",
+            padding: "1.25rem 2rem",
+            color: "oklch(0.9 0.18 55)",
+            fontFamily: "Georgia, serif",
+            fontSize: "1.1rem",
+            textAlign: "center",
+            backdropFilter: "blur(20px)",
+            boxShadow: "0 0 60px oklch(0.62 0.25 20 / 0.6)",
+            pointerEvents: "none",
+            animation: "pulse 1.8s ease-in-out infinite",
+          }}
+        >
+          ♪ Tap anywhere to start music ♪
+        </div>
+      )}
 
       {/* Floating pill button */}
       <button
@@ -72,7 +126,11 @@ export default function MusicPlayer() {
           boxShadow:
             "0 0 18px oklch(0.62 0.25 20 / 0.25), inset 0 1px 0 oklch(0.8 0.1 350 / 0.12)",
           cursor: "pointer",
-          color: playing ? "oklch(0.82 0.14 75)" : "oklch(0.65 0.08 290)",
+          color: playing
+            ? "oklch(0.82 0.14 75)"
+            : blocked
+              ? "oklch(0.75 0.14 350)"
+              : "oklch(0.65 0.08 290)",
           fontSize: "0.75rem",
           letterSpacing: "0.12em",
           fontFamily: "Georgia, serif",
@@ -93,8 +151,12 @@ export default function MusicPlayer() {
             "0 0 18px oklch(0.62 0.25 20 / 0.25), inset 0 1px 0 oklch(0.8 0.1 350 / 0.12)";
         }}
       >
-        <span style={{ fontSize: "1rem" }}>{playing ? "♪" : "🔇"}</span>
-        <span>{playing ? "Music ON" : "Music OFF"}</span>
+        <span style={{ fontSize: "1rem" }}>
+          {playing ? "♪" : blocked ? "♪" : "🔇"}
+        </span>
+        <span>
+          {playing ? "Music ON" : blocked ? "Tap to Play" : "Music OFF"}
+        </span>
       </button>
     </>
   );

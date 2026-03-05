@@ -1,45 +1,43 @@
 # Prachita 3D Hearts
 
 ## Current State
-- Full-screen romantic 3D experience with React Three Fiber
-- Intro: 28 bouncing hearts rain down on page load
-- 3D rotating glowing heart center-stage with "Prachita" gold shimmer name
-- Bear hug animation (two bear images hugging in 3D)
-- Circular photo frame (bottom-right) with Prachita's photo, spinning gold ring, pulse glow
-- Video frame (bottom-left) "Our Moments" playing a looped video
-- Starfield + floating background hearts + particle system
-- Deep romantic dark purple background
+- Full romantic 3D website with hearts, bears, photo frame, video, music player
+- Two game overlays: RacingGame.tsx (3D R3F car dodging obstacles) and FighterGame.tsx (3D R3F stickman vs AI)
+- Both games are functional but visually simple — box geometries, no animations, no "wow" factor
 
 ## Requested Changes (Diff)
 
 ### Add
-1. **Background music** - Play "Ladki Kyon" (or a similar Bollywood-style song) looping in the background. Since we cannot fetch external audio, use the Web Audio API to synthesize a short melodic loop that evokes the feel of the song, OR add a music toggle button that plays a YouTube embed / SoundCloud embed in an iframe (hidden). Best approach: add a floating music control button (bottom-center) that, when clicked, plays an HTML5 `<audio>` element with a looping online source URL for the song. Include a mute/unmute toggle with a musical note icon.
-2. **3D Racing Game** - An "Asphalt Legends"-style 3D racing game accessible via a "Play Racing" button on the main screen. The game opens in a modal/overlay fullscreen. Features:
-   - Top-down or behind-the-car perspective 3D track using React Three Fiber
-   - A simple car mesh (box geometry or stylized) the player drives with arrow keys / WASD
-   - Procedural road/track with lanes, road markings
-   - Obstacles/other cars on the track to dodge
-   - Speed indicator HUD, score counter
-   - Particle effects for speed (motion blur/trail)
-   - Start screen and game-over screen within the modal
-3. **3D Stickman Fighter Game** - An epic battle stickman fighter game accessible via a "Play Fighter" button. Opens in a fullscreen modal overlay. Features:
-   - Side-scrolling 2.5D perspective with 3D stick figure characters built from Three.js primitives (cylinders, spheres)
-   - Player 1 (left) vs AI enemy (right) with health bars
-   - Controls: arrow keys to move, Z to punch, X to kick, C to block
-   - Animated attack/damage sequences
-   - Epic particle effects on hits (sparks, flashes)
-   - Win/lose screen
+- **FighterGame**: Full 2D Canvas-based futuristic fighting game with:
+  - Animated sprite-style characters (hand-drawn via canvas arcs/paths) with smooth walk, punch, kick, jump, block, hurt, KO animations using frame-based keyframe system
+  - Dynamic particle burst system on hits (sparks, energy orbs, screen flash)
+  - Cinematic intro: "ROUND 1 - FIGHT!" text with zoom animation
+  - Combo counter, floating damage numbers
+  - Neon cyberpunk arena background with animated city skyline, scrolling grid floor, animated crowd silhouettes
+  - Screen shake on heavy hits, chromatic aberration flash effect
+  - AI with multiple difficulty patterns (approach, retreat, combo chains)
+  - Super move meter that fills up; player can execute a screen-filling energy blast
+  - Rich HUD: health bars with animated damage decay, power gauge, timer countdown, round display
+- **RacingGame**: Full 2D Canvas-based futuristic racing game with:
+  - Multi-layer parallax scrolling background: distant nebula, city skyline layer, mid-ground buildings, near-ground barriers — all animated
+  - Player car drawn with canvas (sleek futuristic design, neon underglows, animated exhaust flames, rotating wheels)
+  - AI bot cars that actively race against player (overtake, brake, switch lanes) not just static obstacles
+  - Road drawn with perspective foreshortening (pseudo-3D horizon effect like F-Zero/OutRun)
+  - Nitro boost mechanic: collect energy pickups, activate for speed burst with flame trail
+  - Lap/position system: 3 laps, player position among 4 AI cars shown
+  - Crash animation: spinning car, explosion particles, 3-second respawn
+  - Rich HUD: speedometer dial, lap counter, position indicator, nitro bar, mini-map
+  - Dynamic weather: rain streaks that affect handling
 
 ### Modify
-- Main screen: Add two game launch buttons ("Racing Game" and "Fighter Game") positioned at the bottom of the screen, above the footer, styled with a glass card aesthetic matching the site's theme
-- Main screen: Add a floating music toggle button (bottom-center area)
+- Replace existing `FighterGame.tsx` entirely with new 2D canvas implementation
+- Replace existing `RacingGame.tsx` entirely with new 2D canvas implementation
+- Keep same props interface (`onClose: () => void`) so App.tsx needs no changes
 
 ### Remove
-- Nothing removed
+- Old 3D R3F game scenes inside FighterGame and RacingGame (replaced by 2D Canvas)
 
 ## Implementation Plan
-1. Add music toggle component with a floating button (bottom-center). Use an iframe embed pointing to a public streaming URL OR use a simple synthesized melody via Web Audio API as fallback. Include play/pause state and a musical note icon.
-2. Create `RacingGame.tsx` component - full-screen overlay with a React Three Fiber canvas. Implement car mesh, procedural road, obstacles, HUD (speed/score), start/gameover screens. Controls: WASD/arrows.
-3. Create `FighterGame.tsx` component - full-screen overlay with React Three Fiber canvas. Implement two stickman characters from primitives, health bars, attack animations, AI opponent logic. Controls: WASD move + Z/X/C attacks.
-4. Add two game launch buttons to App.tsx overlaid on the main screen (bottom-center).
-5. Wire up state: `showRacingGame` and `showFighterGame` booleans in App.tsx to show/hide game overlays.
+1. Rewrite `FighterGame.tsx`: Canvas 2D engine, animated fighter characters, particle system, neon cyberpunk arena, AI logic, combo/super system, full HUD
+2. Rewrite `RacingGame.tsx`: Canvas 2D engine, pseudo-3D road, parallax city background, AI bot racers, nitro system, lap tracking, full HUD
+3. Validate build (typecheck, lint, build)
