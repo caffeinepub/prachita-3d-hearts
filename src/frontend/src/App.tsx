@@ -445,7 +445,6 @@ function Starfield() {
 // ===== VIDEO FRAME (HTML overlay) =====
 interface VideoFrameProps {
   show: boolean;
-  // videoSrc?: string; // Uncomment when a video file is available
 }
 
 function VideoFrame({ show }: VideoFrameProps) {
@@ -484,75 +483,14 @@ function VideoFrame({ show }: VideoFrameProps) {
             style={{ width: 220, height: 140 }}
             data-ocid="video.panel"
           >
-            {/* Uncomment below when a video file is provided */}
-            {/* <video
-              src={videoSrc}
+            <video
+              src="/assets/WhatsApp Video 2026-03-05 at 6.44.40 PM-3.mp4"
               autoPlay
               loop
               muted
               playsInline
               className="w-full h-full object-cover"
-            /> */}
-
-            {/* Placeholder */}
-            <div
-              className="w-full h-full flex flex-col items-center justify-center gap-2 relative"
-              style={{
-                background:
-                  "linear-gradient(135deg, oklch(0.12 0.06 320 / 0.9) 0%, oklch(0.09 0.04 290 / 0.95) 100%)",
-              }}
-            >
-              {/* Subtle decorative border glow */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background:
-                    "radial-gradient(ellipse at 50% 50%, oklch(0.55 0.22 350 / 0.08) 0%, transparent 70%)",
-                }}
-              />
-
-              {/* Play button icon */}
-              <svg
-                width="38"
-                height="38"
-                viewBox="0 0 38 38"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                role="img"
-                aria-label="Play video"
-                style={{
-                  opacity: 0.7,
-                  filter: "drop-shadow(0 0 8px oklch(0.72 0.22 350 / 0.5))",
-                }}
-              >
-                <title>Play video</title>
-                <circle
-                  cx="19"
-                  cy="19"
-                  r="17"
-                  stroke="oklch(0.72 0.22 350 / 0.6)"
-                  strokeWidth="1.5"
-                  fill="oklch(0.15 0.06 300 / 0.5)"
-                />
-                <polygon
-                  points="15,12 28,19 15,26"
-                  fill="oklch(0.82 0.18 40 / 0.85)"
-                />
-              </svg>
-
-              {/* Text */}
-              <p
-                style={{
-                  fontFamily: "Georgia, 'Times New Roman', serif",
-                  fontStyle: "italic",
-                  fontSize: "0.65rem",
-                  letterSpacing: "0.12em",
-                  color: "oklch(0.65 0.1 350 / 0.65)",
-                }}
-              >
-                Video coming soon
-              </p>
-            </div>
+            />
           </div>
         </motion.div>
       )}
